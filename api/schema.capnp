@@ -34,6 +34,9 @@ struct DockerBuild {
 
   includeGit   @8 :Bool;
   # If set, include the .git directory in the build context.
+
+  ulimit       @9 :List(Text);
+  # Options to pass to `docker build` using `--ulimit`.
 }
 
 struct OBuilder {

@@ -22,6 +22,7 @@ module Spec : sig
     squash : bool;
     buildkit: bool;
     include_git : bool;
+    ulimit : string list;  (** "--ulimit" arguments. *)
   } [@@deriving yojson]
 
   type t = {

@@ -200,6 +200,14 @@ let build_args =
     ~docv:"ARG"
     ["build-arg"]
 
+let ulimit =
+  Arg.value @@
+    Arg.(opt_all string) [] @@
+      Arg.info
+        ~doc:"Docker ulimit argument."
+        ~docv:"ULIMIT"
+        ["ulimit"]
+
 let secrets =
   (Arg.value @@
    Arg.(opt_all (pair ~sep:':' string file)) [] @@
@@ -246,10 +254,10 @@ let push_to =
   Term.(const make $ push_to $ push_user $ push_password_file)
 
 let build_options =
-  let make build_args squash buildkit include_git =
-    { Cluster_api.Docker.Spec.build_args; squash; buildkit; include_git }
+  let make build_args squash buildkit include_git ulimit =
+    { Cluster_api.Docker.Spec.build_args; squash; buildkit; include_git; ulimit }
   in
-  Term.(const make $ build_args $ squash $ buildkit $ include_git)
+  Term.(const make $ build_args $ squash $ buildkit $ include_git $ ulimit )
 
 let submit_options_common =
   let make submission_path pool repository commits cache_hint urgent secrets =

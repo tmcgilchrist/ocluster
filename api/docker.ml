@@ -40,6 +40,7 @@ module Spec = struct
     squash : bool;
     buildkit: bool;
     include_git : bool [@default true];
+    ulimit : string list;
   } [@@deriving yojson]
 
   type t = {
@@ -53,6 +54,7 @@ module Spec = struct
     squash = false;
     buildkit = false;
     include_git = false;
+    ulimit = [];
   }
 
   let init b { dockerfile; options; push_to } =
@@ -64,11 +66,12 @@ module Spec = struct
       | `Contents contents -> Dockerfile.contents_set dockerfile_b contents
       | `Path path -> Dockerfile.path_set dockerfile_b path
     end;
-    let { build_args; squash; buildkit; include_git } = options in
+    let { build_args; squash; buildkit; include_git; ulimit } = options in
     DB.build_args_set_list b build_args |> ignore;
     DB.squash_set b squash;
     DB.buildkit_set b buildkit;
     DB.include_git_set b include_git;
+    DB.ulimit_set_list b ulimit  |> ignore;
     push_to |> Option.iter (fun { target; auth } ->
         DB.push_target_set b (Image_id.to_string target);
         Option.iter (fun (user, password) ->
@@ -93,7 +96,8 @@ module Spec = struct
     let squash = R.squash_get r in
     let buildkit = R.buildkit_get r in
     let include_git = R.include_git_get r in
-    let options = { build_args; squash; buildkit; include_git } in
+    let ulimit = R.ulimit_get_list r in
+    let options = { build_args; squash; buildkit; include_git; ulimit } in
     let push_to =
       match target, user, password with
       | "", "", "" -> None
